@@ -160,6 +160,49 @@ fig, stats = simulate(nb_tirs, niveau_moyen, planche_largeur, planche_hauteur)
 st.pyplot(fig)
 st.code(stats)
 
+import plotly.graph_objects as go
+
+# === GRAPHIQUE INTERACTIF PLOTLY ===
+if st.checkbox("🔍 Voir la version interactive 2D (Plotly)"):
+    fig_plotly = go.Figure()
+
+    fig_plotly.add_trace(go.Scatter(
+        x=x_coords, y=y_coords, mode='markers',
+        marker=dict(color=colors, size=5, opacity=0.7),
+        name="Tirs"
+    ))
+
+    # Cible
+    circle_theta = np.linspace(0, 2*np.pi, 100)
+    circle_x = target_center[0] + target_radius * np.cos(circle_theta)
+    circle_y = target_center[1] + target_radius * np.sin(circle_theta)
+    fig_plotly.add_trace(go.Scatter(
+        x=circle_x, y=circle_y, mode='lines',
+        line=dict(color='black', width=2),
+        name="Cible"
+    ))
+
+    # Planche
+    fig_plotly.add_shape(type="rect",
+        x0=-planche_largeur/2, x1=planche_largeur/2,
+        y0=target_center[1] - planche_hauteur/2,
+        y1=target_center[1] + planche_hauteur/2,
+        line=dict(color="black", width=2),
+        fillcolor="lightyellow", opacity=0.3
+    )
+
+    fig_plotly.update_layout(
+        title="🎯 Vue interactive 2D des tirs simulés",
+        xaxis_title="Largeur (cm)",
+        yaxis_title="Hauteur (cm)",
+        width=700,
+        height=800,
+        showlegend=False
+    )
+
+    st.plotly_chart(fig_plotly)
+
+
 # === OPTIMISATION ===
 with st.expander("🔎 Optimisation automatique de la taille de planche carrée"):
     if st.button("Calculer la taille optimale"):
