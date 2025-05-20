@@ -4,6 +4,52 @@
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
+from fpdf import FPDF
+from datetime import datetime
+import io
+
+
+# === FONCTION PDF ===
+def generate_pdf(niveau_moyen, largeur, hauteur, nb_tirs, stats_text, fig):
+    img_buf = io.BytesIO()
+    fig.savefig(img_buf, format='png')
+    img_buf.seek(0)
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+
+    pdf.set_font("Arial", 'B', 16)
+    pdf.cell(0, 10, "Rapport de simulation - Planche de fléchettes", ln=True, align='C')
+    pdf.ln(10)
+
+    pdf.set_font("Arial", '', 10)
+    pdf.cell(0, 10, f"Date : {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}", ln=True)
+    pdf.ln(5)
+
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(0, 10, "Paramètres de simulation :", ln=True)
+    pdf.set_font("Arial", '', 11)
+    pdf.multi_cell(0, 8,
+        f"- Niveau moyen des joueurs : {niveau_moyen:.1f}/10\n"
+        f"- Taille de la planche : {largeur} x {hauteur} cm\n"
+        f"- Nombre de tirs simulés : {nb_tirs}")
+
+    pdf.ln(5)
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(0, 10, "Résultats :", ln=True)
+    pdf.set_font("Arial", '', 11)
+    for line in stats_text.split('\n'):
+        pdf.cell(0, 8, line, ln=True)
+
+    img_path = "/tmp/simulation_result.png"
+    with open(img_path, "wb") as f:
+        f.write(img_buf.read())
+    pdf.image(img_path, x=30, w=150)
+
+    pdf_path = "/tmp/rapport_flechettes.pdf"
+    pdf.output(pdf_path)
+    return pdf_path
 
 # === FONCTION D’OPTIMISATION ===
 def optimiser_taille_planche(niveau, nb_tirs=1000, seuil_couverture=98.0):
