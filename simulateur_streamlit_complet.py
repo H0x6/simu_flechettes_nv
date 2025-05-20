@@ -122,4 +122,13 @@ with st.expander("🔎 Optimisation automatique de la taille de planche carrée"
             st.success(f"Taille optimale trouvée : {taille_opt} × {taille_opt} cm\n→ Couverture : {couverture_opt:.1f}%")
         else:
             st.error("Aucune taille trouvée pour atteindre le seuil de couverture.")
+
+
+
+# Génération du PDF
+if st.button("📄 Générer le rapport PDF"):
+    pdf_path = generate_pdf(niveau_moyen, planche_largeur, planche_hauteur, nb_tirs, stats, fig)
+    with open(pdf_path, "rb") as f:
+        st.download_button("📥 Télécharger le rapport PDF", f, file_name="rapport_flechettes.pdf")
+
 # === FIN DU CODE ===
